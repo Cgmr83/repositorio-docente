@@ -1,0 +1,359 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Subir material</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Source+Serif+4:opsz,wght@8..60,400;8..60,600;8..60,700&family=IBM+Plex+Sans:wght@400;500;600&display=swap');
+
+  :root{
+    --paper: #F1F3EC;
+    --card: #FBFBF7;
+    --ink: #1F2A24;
+    --ink-soft: #4B564E;
+    --line: #D9D9CB;
+    --gold: #B4842A;
+    --gold-light: #F3E8D2;
+    --pine: #2F6F62;
+    --pine-light: #E4EEEB;
+  }
+
+  *{ box-sizing: border-box; }
+
+  body{
+    margin:0;
+    background: var(--paper);
+    color: var(--ink);
+    font-family: 'IBM Plex Sans', sans-serif;
+  }
+
+  h1, h2, .serif { font-family: 'Source Serif 4', serif; }
+
+  .wrap{
+    max-width: 640px;
+    margin: 0 auto;
+    padding: 40px 24px 80px 24px;
+  }
+
+  .volver{
+    font-size: 13px;
+    color: var(--ink-soft);
+    text-decoration: none;
+    display:inline-flex;
+    align-items:center;
+    gap:6px;
+    margin-bottom: 20px;
+  }
+
+  h1{
+    font-size: 26px;
+    font-weight: 600;
+    margin: 0 0 4px 0;
+  }
+  .subtitulo{
+    font-size: 14px;
+    color: var(--ink-soft);
+    margin: 0 0 32px 0;
+  }
+
+  form{
+    background: var(--card);
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    padding: 28px 28px 8px 28px;
+  }
+
+  .campo{
+    margin-bottom: 24px;
+  }
+  .campo label{
+    display:block;
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--ink);
+    margin-bottom: 6px;
+  }
+  .campo .ayuda{
+    font-size: 12px;
+    color: var(--ink-soft);
+    margin-top: 5px;
+    line-height:1.4;
+  }
+
+  input[type=text], textarea, select{
+    width:100%;
+    font-family: inherit;
+    font-size: 14px;
+    color: var(--ink);
+    background: var(--paper);
+    border: 1px solid var(--line);
+    border-radius: 6px;
+    padding: 10px 12px;
+    outline: none;
+  }
+  input[type=text]:focus, textarea:focus, select:focus{
+    border-color: var(--pine);
+  }
+  textarea{ resize: vertical; min-height: 70px; }
+
+  .fila-dos{
+    display:grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+  }
+
+  /* ---------- combobox con opción de agregar nuevo ---------- */
+  .combo{
+    position: relative;
+  }
+  .chips{
+    display:flex;
+    flex-wrap:wrap;
+    gap:6px;
+    margin-bottom: 8px;
+  }
+  .chip{
+    display:flex;
+    align-items:center;
+    gap:6px;
+    background: var(--pine-light);
+    color: var(--pine);
+    font-size: 13px;
+    padding: 5px 8px 5px 10px;
+    border-radius: 20px;
+  }
+  .chip.nueva{
+    background: var(--gold-light);
+    color: #8a5f14;
+  }
+  .chip.nueva::after{
+    content: "pendiente";
+    font-size: 10px;
+    font-style: italic;
+    opacity: 0.85;
+    margin-left: 2px;
+  }
+  .chip button{
+    border:none;
+    background:transparent;
+    cursor:pointer;
+    color: inherit;
+    font-size: 14px;
+    line-height:1;
+    padding:0;
+    opacity:0.6;
+  }
+  .chip button:hover{ opacity:1; }
+
+  .combo-lista{
+    position:absolute;
+    top: calc(100% + 4px);
+    left:0; right:0;
+    background: var(--card);
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    box-shadow: 0 8px 20px rgba(31,42,36,0.12);
+    max-height: 220px;
+    overflow-y:auto;
+    z-index: 10;
+    display:none;
+  }
+  .combo-lista.abierta{ display:block; }
+  .combo-opcion{
+    padding: 9px 14px;
+    font-size: 14px;
+    cursor:pointer;
+    color: var(--ink);
+  }
+  .combo-opcion:hover, .combo-opcion.activa{
+    background: var(--pine-light);
+  }
+  .combo-opcion-nueva{
+    padding: 10px 14px;
+    font-size: 13.5px;
+    cursor:pointer;
+    color: #8a5f14;
+    border-top: 1px dashed var(--line);
+    display:flex;
+    align-items:center;
+    gap:6px;
+  }
+  .combo-opcion-nueva:hover{ background: var(--gold-light); }
+  .combo-opcion-nueva strong{ font-weight:600; }
+
+  .subir-btn{
+    background: var(--pine);
+    color: white;
+    border:none;
+    padding: 12px 22px;
+    border-radius: 6px;
+    font-family: inherit;
+    font-size: 14px;
+    font-weight: 500;
+    cursor:pointer;
+    width:100%;
+    margin: 8px 0 24px 0;
+  }
+  .subir-btn:hover{ background: #275c51; }
+</style>
+</head>
+<body>
+
+<div class="wrap">
+  <a class="volver" href="#">← Volver a Materiales</a>
+  <h1>Subir material</h1>
+  <p class="subtitulo">Completá los datos. Si una materia o contenido no está en la lista, podés agregarlo vos mismo/a.</p>
+
+  <form onsubmit="return false;">
+
+    <div class="campo">
+      <label>Título del material</label>
+      <input type="text" placeholder="Ej: Guía de ejercicios sobre derivadas">
+    </div>
+
+    <div class="campo combo">
+      <label>Materia</label>
+      <div class="chips" id="chips-materia">
+        <span class="chip">Radiación y Vida <button onclick="quitarChip(this)">×</button></span>
+      </div>
+      <input type="text" id="input-materia" placeholder="Escribí para buscar o agregar una materia…" autocomplete="off">
+      <div class="combo-lista" id="lista-materia"></div>
+      <p class="ayuda">Si escribís algo que no existe, se agrega como pendiente de aprobación hasta que un administrador lo revise.</p>
+    </div>
+
+    <div class="fila-dos">
+      <div class="campo">
+        <label>Año</label>
+        <select>
+          <option>1.º año</option>
+          <option>2.º año</option>
+          <option>3.º año</option>
+          <option selected>4.º año</option>
+          <option>5.º año</option>
+          <option>6.º año</option>
+        </select>
+      </div>
+      <div class="campo">
+        <label>Tipo de archivo</label>
+        <select>
+          <option>Presentación</option>
+          <option>Texto</option>
+          <option>Planificación</option>
+          <option>Proyecto / laboratorio</option>
+          <option>Simulador</option>
+          <option selected>Experimento</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="campo combo">
+      <label>Contenido</label>
+      <div class="chips" id="chips-contenido"></div>
+      <input type="text" id="input-contenido" placeholder="Escribí para buscar o agregar un contenido…" autocomplete="off">
+      <div class="combo-lista" id="lista-contenido"></div>
+      <p class="ayuda">Podés agregar más de uno. Igual que con Materia: si no existe, queda pendiente de aprobación.</p>
+    </div>
+
+    <div class="campo">
+      <label>Descripción</label>
+      <textarea placeholder="Un par de líneas sobre el material…"></textarea>
+    </div>
+
+    <div class="campo">
+      <label>Archivo</label>
+      <input type="text" value="fluidez-de-membrana.pdf" readonly style="color:var(--ink-soft)">
+    </div>
+
+    <button class="subir-btn" type="submit">Publicar material</button>
+  </form>
+</div>
+
+<script>
+  // Listas "existentes" de ejemplo — en la versión real vendrían de la base de datos
+  const opcionesBase = {
+    materia: ["Física","Fisicoquímica","Biología","Matemática","Química","Partículas, Energía y Cosmología","Radiación y Vida","Química, Alimentación y Salud","Ecología","Historia de la Vida y de la Tierra","Filosofía de la Ciencia y la Tecnología","Problemáticas Científicas con Impacto Social","Lógica y Filosofía de la Ciencia","Matemática para la Física","Física y Tecnología","Problemáticas de la Física Actual","Laboratorio"],
+    contenido: ["Álgebra","Biotecnología","Derivada","Energía","Estadística y probabilidad","Evolución","Geometría","Integral","Límite","Salud y ambiente","Universo y radiación"]
+  };
+
+  function setupCombo(nombre){
+    const input = document.getElementById('input-' + nombre);
+    const lista = document.getElementById('lista-' + nombre);
+    const chipsBox = document.getElementById('chips-' + nombre);
+
+    function seleccionados(){
+      return Array.from(chipsBox.querySelectorAll('.chip')).map(c => c.firstChild.textContent.trim());
+    }
+
+    function agregarChip(texto, esNueva){
+      const chip = document.createElement('span');
+      chip.className = 'chip' + (esNueva ? ' nueva' : '');
+      chip.innerHTML = texto + ' <button onclick="quitarChip(this)">×</button>';
+      chipsBox.appendChild(chip);
+      input.value = '';
+      renderLista('');
+      lista.classList.remove('abierta');
+    }
+
+    function renderLista(query){
+      const q = query.trim().toLowerCase();
+      const yaElegidas = seleccionados();
+      const coincidencias = opcionesBase[nombre].filter(op =>
+        !yaElegidas.includes(op) && op.toLowerCase().includes(q)
+      );
+
+      lista.innerHTML = '';
+
+      if (q.length > 0) {
+        coincidencias.slice(0, 8).forEach(op => {
+          const item = document.createElement('div');
+          item.className = 'combo-opcion';
+          item.textContent = op;
+          item.onclick = () => agregarChip(op, false);
+          lista.appendChild(item);
+        });
+
+        const existeExacto = opcionesBase[nombre].some(op => op.toLowerCase() === q);
+        if (!existeExacto) {
+          const nueva = document.createElement('div');
+          nueva.className = 'combo-opcion-nueva';
+          nueva.innerHTML = '+ Agregar <strong>"' + query.trim() + '"</strong> (queda pendiente de aprobación)';
+          nueva.onclick = () => agregarChip(query.trim(), true);
+          lista.appendChild(nueva);
+        }
+      } else {
+        coincidencias.slice(0, 8).forEach(op => {
+          const item = document.createElement('div');
+          item.className = 'combo-opcion';
+          item.textContent = op;
+          item.onclick = () => agregarChip(op, false);
+          lista.appendChild(item);
+        });
+      }
+
+      lista.classList.toggle('abierta', lista.children.length > 0);
+    }
+
+    input.addEventListener('input', () => renderLista(input.value));
+    input.addEventListener('focus', () => renderLista(input.value));
+    input.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter' && input.value.trim().length > 0) {
+        e.preventDefault();
+        agregarChip(input.value.trim(), !opcionesBase[nombre].some(op => op.toLowerCase() === input.value.trim().toLowerCase()));
+      }
+    });
+    document.addEventListener('click', (e) => {
+      if (!e.target.closest('.combo')) lista.classList.remove('abierta');
+    });
+  }
+
+  function quitarChip(btn){
+    btn.parentElement.remove();
+  }
+
+  setupCombo('materia');
+  setupCombo('contenido');
+</script>
+
+</body>
+</html>

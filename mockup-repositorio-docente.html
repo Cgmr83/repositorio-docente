@@ -1,0 +1,605 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Recursero de Exactas y Naturales</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Source+Serif+4:opsz,wght@8..60,400;8..60,600;8..60,700&family=IBM+Plex+Sans:wght@400;500;600&display=swap');
+
+  :root{
+    --paper: #F1F3EC;
+    --card: #FBFBF7;
+    --ink: #1F2A24;
+    --ink-soft: #4B564E;
+    --line: #D9D9CB;
+    --gold: #B4842A;
+    --pine: #2F6F62;
+    --pine-light: #E4EEEB;
+  }
+
+  *{ box-sizing: border-box; }
+
+  body{
+    margin:0;
+    background: var(--paper);
+    color: var(--ink);
+    font-family: 'IBM Plex Sans', sans-serif;
+  }
+
+  h1, h2, h3, .serif { font-family: 'Source Serif 4', serif; }
+
+  /* ---------- header ---------- */
+  header{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    padding: 22px 40px;
+    border-bottom: 1px solid var(--line);
+    background: var(--paper);
+  }
+
+  .brand{
+    display:flex;
+    align-items:baseline;
+    gap:10px;
+  }
+  .brand h1{
+    font-size: 22px;
+    font-weight: 600;
+    margin:0;
+    letter-spacing: 0.2px;
+  }
+  .brand span{
+    font-size:13px;
+    color: var(--ink-soft);
+  }
+
+  .searchbar{
+    display:flex;
+    align-items:center;
+    gap:8px;
+    background: var(--card);
+    border: 1px solid var(--line);
+    border-radius: 6px;
+    padding: 9px 14px;
+    width: 340px;
+  }
+  .searchbar input{
+    border:none;
+    background:transparent;
+    outline:none;
+    font-family: inherit;
+    font-size: 14px;
+    width:100%;
+    color: var(--ink);
+  }
+  .searchbar svg{ flex-shrink:0; opacity:0.55; }
+
+  .subir-btn{
+    background: var(--pine);
+    color: white;
+    border:none;
+    padding: 10px 18px;
+    border-radius: 6px;
+    font-family: inherit;
+    font-size: 14px;
+    font-weight: 500;
+    cursor:pointer;
+  }
+  .subir-btn:hover{ background: #275c51; }
+
+  header .right{ display:flex; align-items:center; gap:16px; }
+
+  /* ---------- layout ---------- */
+  .layout{
+    display:grid;
+    grid-template-columns: 220px 1fr;
+    gap: 0;
+    max-width: 1240px;
+    margin: 0 auto;
+  }
+
+  aside{
+    padding: 32px 24px 32px 40px;
+    border-right: 1px solid var(--line);
+  }
+
+  .filtro-grupo{ margin-bottom: 28px; }
+  .filtro-grupo h3{
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--ink-soft);
+    margin: 0 0 10px 0;
+    font-family: 'IBM Plex Sans', sans-serif;
+  }
+  .indice-alfabetico{
+    display:flex;
+    flex-wrap:wrap;
+    gap: 4px;
+    margin-bottom: 10px;
+  }
+  .indice-alfabetico button{
+    width: 22px;
+    height: 22px;
+    font-size: 11px;
+    font-family: 'IBM Plex Sans', sans-serif;
+    border: 1px solid var(--line);
+    background: var(--card);
+    border-radius: 4px;
+    cursor: pointer;
+    color: var(--ink-soft);
+    padding: 0;
+  }
+  .indice-alfabetico button:hover{
+    background: var(--pine-light);
+    border-color: var(--pine);
+    color: var(--pine);
+  }
+  .lista-contenido{
+    max-height: 230px;
+    overflow-y: auto;
+    scroll-behavior: smooth;
+    border: 1px solid var(--line);
+    border-radius: 6px;
+    padding: 4px 12px 10px 12px;
+    background: var(--card);
+  }
+  .letra-header{
+    display: block;
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--gold);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin: 12px 0 4px 0;
+  }
+  .letra-grupo:first-child .letra-header{ margin-top: 8px; }
+  .lista-contenido label{
+    display:flex;
+    align-items:center;
+    gap:8px;
+    font-size: 14px;
+    color: var(--ink);
+    margin-bottom: 8px;
+    cursor:pointer;
+  }
+  .lista-contenido input[type=checkbox]{
+    accent-color: var(--pine);
+    width:15px; height:15px;
+  }
+  .filtro-grupo label{
+    display:flex;
+    align-items:center;
+    gap:8px;
+    font-size: 14px;
+    color: var(--ink);
+    margin-bottom: 8px;
+    cursor:pointer;
+  }
+  .filtro-grupo input[type=checkbox]{
+    accent-color: var(--pine);
+    width:15px; height:15px;
+  }
+
+  main{ padding: 32px 40px; }
+
+  .main-top{
+    display:flex;
+    justify-content:space-between;
+    align-items:baseline;
+    margin-bottom: 22px;
+    border-bottom: 1px solid var(--line);
+    padding-bottom: 16px;
+  }
+  .main-top h2{
+    font-size: 26px;
+    margin:0;
+    font-weight: 600;
+  }
+  .main-top p{
+    margin: 6px 0 0 0;
+    color: var(--ink-soft);
+    font-size: 14px;
+  }
+  .conteo{ font-size: 14px; color: var(--ink-soft); }
+
+  /* ---------- grid de tarjetas ---------- */
+  .grid{
+    display:grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 18px;
+  }
+
+  .tarjeta{
+    background: var(--card);
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    padding: 20px;
+    display:flex;
+    flex-direction:column;
+    gap: 10px;
+  }
+
+  .tarjeta-top{
+    display:flex;
+    justify-content:space-between;
+    align-items:flex-start;
+    gap: 10px;
+  }
+
+  .materia-tag{
+    font-size: 12px;
+    color: var(--pine);
+    background: var(--pine-light);
+    padding: 3px 10px;
+    border-radius: 4px;
+    font-weight: 500;
+  }
+
+  .tipo-icono{
+    width: 34px; height:34px;
+    border-radius: 6px;
+    background: var(--paper);
+    border: 1px solid var(--line);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-size: 13px;
+    color: var(--ink-soft);
+    flex-shrink:0;
+  }
+
+  .tarjeta h3{
+    font-size: 17px;
+    margin: 2px 0 0 0;
+    line-height: 1.35;
+    font-weight: 600;
+  }
+
+  .tarjeta p.desc{
+    font-size: 13.5px;
+    color: var(--ink-soft);
+    line-height: 1.5;
+    margin: 0;
+  }
+
+  .tarjeta-meta{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    margin-top: 6px;
+    padding-top: 12px;
+    border-top: 1px solid var(--line);
+    font-size: 12.5px;
+    color: var(--ink-soft);
+  }
+
+  .autor{ display:flex; align-items:center; gap:7px; }
+  .avatar{
+    width: 22px; height:22px;
+    border-radius: 50%;
+    background: var(--gold);
+    color: white;
+    font-size: 10px;
+    font-weight: 600;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+  }
+
+  .nivel{ color: var(--ink-soft); }
+
+  @media (max-width: 800px){
+    .layout{ grid-template-columns: 1fr; }
+    aside{ border-right:none; border-bottom: 1px solid var(--line); }
+    .grid{ grid-template-columns: 1fr; }
+    header{ flex-direction:column; align-items:flex-start; gap:14px; }
+    .searchbar{ width:100%; }
+  }
+</style>
+</head>
+<body>
+
+  <header>
+    <div class="brand">
+      <h1>Recursero de Exactas y Naturales</h1>
+    </div>
+    <div class="right">
+      <div class="searchbar">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+        <input type="text" id="buscador" placeholder="Buscar por título, materia o autor…">
+      </div>
+      <button class="subir-btn">Subir material</button>
+    </div>
+  </header>
+
+  <div class="layout">
+    <aside>
+      <div class="filtro-grupo">
+        <h3>Materia</h3>
+        <label><input type="checkbox" class="filtro-materia" value="física"> Física</label>
+        <label><input type="checkbox" class="filtro-materia" value="fisicoquímica"> Fisicoquímica</label>
+        <label><input type="checkbox" class="filtro-materia" value="biología"> Biología</label>
+        <label><input type="checkbox" class="filtro-materia" value="matemática"> Matemática</label>
+        <label><input type="checkbox" class="filtro-materia" value="química"> Química</label>
+        <label><input type="checkbox" class="filtro-materia" value="partículas, energía y cosmología"> Partículas, Energía y Cosmología</label>
+        <label><input type="checkbox" class="filtro-materia" value="radiación y vida"> Radiación y Vida</label>
+        <label><input type="checkbox" class="filtro-materia" value="química, alimentación y salud"> Química, Alimentación y Salud</label>
+        <label><input type="checkbox" class="filtro-materia" value="ecología"> Ecología</label>
+        <label><input type="checkbox" class="filtro-materia" value="historia de la vida y de la tierra"> Historia de la Vida y de la Tierra</label>
+        <label><input type="checkbox" class="filtro-materia" value="filosofía de la ciencia y la tecnología"> Filosofía de la Ciencia y la Tecnología</label>
+        <label><input type="checkbox" class="filtro-materia" value="problemáticas científicas con impacto social"> Problemáticas Científicas con Impacto Social</label>
+        <label><input type="checkbox" class="filtro-materia" value="lógica y filosofía de la ciencia"> Lógica y Filosofía de la Ciencia</label>
+        <label><input type="checkbox" class="filtro-materia" value="matemática para la física"> Matemática para la Física</label>
+        <label><input type="checkbox" class="filtro-materia" value="física y tecnología"> Física y Tecnología</label>
+        <label><input type="checkbox" class="filtro-materia" value="problemáticas de la física actual"> Problemáticas de la Física Actual</label>
+        <label><input type="checkbox" class="filtro-materia" value="laboratorio"> Laboratorio</label>
+      </div>
+      <div class="filtro-grupo">
+        <h3>Año</h3>
+        <label><input type="checkbox" class="filtro-anio" value="1"> 1.º año</label>
+        <label><input type="checkbox" class="filtro-anio" value="2"> 2.º año</label>
+        <label><input type="checkbox" class="filtro-anio" value="3"> 3.º año</label>
+        <label><input type="checkbox" class="filtro-anio" value="4"> 4.º año</label>
+        <label><input type="checkbox" class="filtro-anio" value="5"> 5.º año</label>
+        <label><input type="checkbox" class="filtro-anio" value="6"> 6.º año</label>
+      </div>
+      <div class="filtro-grupo">
+        <h3>Contenido</h3>
+        <div class="indice-alfabetico">
+          <button type="button" data-letra="A">A</button>
+          <button type="button" data-letra="B">B</button>
+          <button type="button" data-letra="D">D</button>
+          <button type="button" data-letra="E">E</button>
+          <button type="button" data-letra="G">G</button>
+          <button type="button" data-letra="I">I</button>
+          <button type="button" data-letra="L">L</button>
+          <button type="button" data-letra="S">S</button>
+          <button type="button" data-letra="U">U</button>
+        </div>
+        <div class="lista-contenido">
+          <div class="letra-grupo">
+            <span class="letra-header" id="letra-A">A</span>
+            <label><input type="checkbox" class="filtro-contenido" value="álgebra"> Álgebra</label>
+          </div>
+          <div class="letra-grupo">
+            <span class="letra-header" id="letra-B">B</span>
+            <label><input type="checkbox" class="filtro-contenido" value="biotecnología"> Biotecnología</label>
+          </div>
+          <div class="letra-grupo">
+            <span class="letra-header" id="letra-D">D</span>
+            <label><input type="checkbox" class="filtro-contenido" value="derivada"> Derivada</label>
+          </div>
+          <div class="letra-grupo">
+            <span class="letra-header" id="letra-E">E</span>
+            <label><input type="checkbox" class="filtro-contenido" value="energía"> Energía</label>
+            <label><input type="checkbox" class="filtro-contenido" value="estadística y probabilidad"> Estadística y probabilidad</label>
+            <label><input type="checkbox" class="filtro-contenido" value="evolución"> Evolución</label>
+          </div>
+          <div class="letra-grupo">
+            <span class="letra-header" id="letra-G">G</span>
+            <label><input type="checkbox" class="filtro-contenido" value="geometría"> Geometría</label>
+          </div>
+          <div class="letra-grupo">
+            <span class="letra-header" id="letra-I">I</span>
+            <label><input type="checkbox" class="filtro-contenido" value="integral"> Integral</label>
+          </div>
+          <div class="letra-grupo">
+            <span class="letra-header" id="letra-L">L</span>
+            <label><input type="checkbox" class="filtro-contenido" value="límite"> Límite</label>
+          </div>
+          <div class="letra-grupo">
+            <span class="letra-header" id="letra-S">S</span>
+            <label><input type="checkbox" class="filtro-contenido" value="salud y ambiente"> Salud y ambiente</label>
+          </div>
+          <div class="letra-grupo">
+            <span class="letra-header" id="letra-U">U</span>
+            <label><input type="checkbox" class="filtro-contenido" value="universo y radiación"> Universo y radiación</label>
+          </div>
+        </div>
+      </div>
+      <div class="filtro-grupo">
+        <h3>Tipo de archivo</h3>
+        <label><input type="checkbox" class="filtro-tipo" value="presentación"> Presentación</label>
+        <label><input type="checkbox" class="filtro-tipo" value="texto"> Texto</label>
+        <label><input type="checkbox" class="filtro-tipo" value="planificación"> Planificación</label>
+        <label><input type="checkbox" class="filtro-tipo" value="proyecto / laboratorio"> Proyecto / laboratorio</label>
+        <label><input type="checkbox" class="filtro-tipo" value="simulador"> Simulador</label>
+        <label><input type="checkbox" class="filtro-tipo" value="experimento"> Experimento</label>
+      </div>
+    </aside>
+
+    <main>
+      <div class="main-top">
+        <div>
+          <h2>Materiales</h2>
+          <p>Ciencias Naturales y Matemática — nivel secundario.</p>
+        </div>
+        <div class="conteo">42 materiales</div>
+      </div>
+
+      <div class="grid">
+
+        <div class="tarjeta" data-titulo="radiación ionizante" data-materia="radiación y vida" data-anio="5" data-contenido="universo y radiación" data-tipo="presentación">
+          <div class="tarjeta-top">
+            <span class="materia-tag">Radiación y Vida</span>
+            <div class="tipo-icono">PRE</div>
+          </div>
+          <h3>Radiación ionizante: usos diagnósticos y terapéuticos</h3>
+          <p class="desc">Presentación sobre la interacción de la radiación con los tejidos vivos y sus aplicaciones médicas.</p>
+          <div class="tarjeta-meta">
+            <div class="autor">
+              <div class="avatar">SC</div>
+              <span>Sofía Castro</span>
+            </div>
+            <span class="nivel">5.º año</span>
+          </div>
+        </div>
+
+        <div class="tarjeta" data-titulo="guía teórica: vectores y magnitudes" data-materia="matemática para la física" data-anio="5" data-contenido="geometría" data-tipo="texto">
+          <div class="tarjeta-top">
+            <span class="materia-tag">Matemática para la Física</span>
+            <div class="tipo-icono">TXT</div>
+          </div>
+          <h3>Guía teórica: vectores y magnitudes físicas</h3>
+          <p class="desc">Desarrollo conceptual del tratamiento vectorial aplicado al movimiento y las fuerzas.</p>
+          <div class="tarjeta-meta">
+            <div class="autor">
+              <div class="avatar">JL</div>
+              <span>Juan Lima</span>
+            </div>
+            <span class="nivel">5.º año</span>
+          </div>
+        </div>
+
+        <div class="tarjeta" data-titulo="el registro fósil - guía de laboratorio" data-materia="historia de la vida y de la tierra" data-anio="3" data-contenido="evolución" data-tipo="proyecto / laboratorio">
+          <div class="tarjeta-top">
+            <span class="materia-tag">Historia de la Vida y de la Tierra</span>
+            <div class="tipo-icono">LAB</div>
+          </div>
+          <h3>El registro fósil — guía de laboratorio</h3>
+          <p class="desc">Proyecto experimental para interpretar la datación relativa a partir de estratos simulados.</p>
+          <div class="tarjeta-meta">
+            <div class="autor">
+              <div class="avatar">PD</div>
+              <span>Pablo Díaz</span>
+            </div>
+            <span class="nivel">3.º año</span>
+          </div>
+        </div>
+
+        <div class="tarjeta" data-titulo="planificación anual: dinámica de las poblaciones" data-materia="ecología" data-anio="4" data-contenido="salud y ambiente" data-tipo="planificación">
+          <div class="tarjeta-top">
+            <span class="materia-tag">Ecología</span>
+            <div class="tipo-icono">PLA</div>
+          </div>
+          <h3>Planificación anual: dinámica de poblaciones</h3>
+          <p class="desc">Unidad completa con secuencia de clases, salida de campo y propuesta de evaluación.</p>
+          <div class="tarjeta-meta">
+            <div class="autor">
+              <div class="avatar">MR</div>
+              <span>Marina Rossi</span>
+            </div>
+            <span class="nivel">4.º año</span>
+          </div>
+        </div>
+
+        <div class="tarjeta" data-titulo="simulador de circuitos eléctricos básicos" data-materia="física y tecnología" data-anio="5" data-contenido="energía" data-tipo="simulador">
+          <div class="tarjeta-top">
+            <span class="materia-tag">Física y Tecnología</span>
+            <div class="tipo-icono">SIM</div>
+          </div>
+          <h3>Simulador de circuitos eléctricos básicos</h3>
+          <p class="desc">Herramienta interactiva para armar circuitos y visualizar corriente y voltaje.</p>
+          <div class="tarjeta-meta">
+            <div class="autor">
+              <div class="avatar">LN</div>
+              <span>Lucía Núñez</span>
+            </div>
+            <span class="nivel">5.º año</span>
+          </div>
+        </div>
+
+        <div class="tarjeta" data-titulo="experimento: ph de alimentos de consumo diario" data-materia="química, alimentación y salud" data-anio="4" data-contenido="salud y ambiente" data-tipo="experimento">
+          <div class="tarjeta-top">
+            <span class="materia-tag">Química, Alimentación y Salud</span>
+            <div class="tipo-icono">EXP</div>
+          </div>
+          <h3>Experimento: pH de alimentos de consumo diario</h3>
+          <p class="desc">Actividad grupal para medir y comparar la acidez de distintos alimentos con indicadores caseros.</p>
+          <div class="tarjeta-meta">
+            <div class="autor">
+              <div class="avatar">SC</div>
+              <span>Sofía Castro</span>
+            </div>
+            <span class="nivel">4.º año</span>
+          </div>
+        </div>
+
+        <div class="tarjeta" data-titulo="experimento: fluidez de membrana" data-materia="biología" data-anio="3" data-contenido="biotecnología" data-tipo="experimento">
+          <div class="tarjeta-top">
+            <span class="materia-tag">Biología</span>
+            <div class="tipo-icono">EXP</div>
+          </div>
+          <h3>Experimento: fluidez de membrana</h3>
+          <p class="desc">Actividad grupal.</p>
+          <div class="tarjeta-meta">
+            <div class="autor">
+              <div class="avatar">SC</div>
+              <span>Claudia Muñoz</span>
+            </div>
+            <span class="nivel">3.º año</span>
+          </div>
+        </div>
+
+      </div>
+    </main>
+  </div>
+
+  <script>
+    const buscador = document.getElementById('buscador');
+    const tarjetas = document.querySelectorAll('.tarjeta');
+    const checksAnio = document.querySelectorAll('.filtro-anio');
+    const checksMateria = document.querySelectorAll('.filtro-materia');
+    const checksContenido = document.querySelectorAll('.filtro-contenido');
+    const checksTipo = document.querySelectorAll('.filtro-tipo');
+
+    // Devuelve los "value" de los checkboxes tildados de un grupo, como lista de textos
+    function elegidos(lista) {
+      return Array.from(lista)
+        .filter(function(chk) { return chk.checked; })
+        .map(function(chk) { return chk.value; });
+    }
+
+    function aplicarFiltros() {
+      const consulta = buscador.value.toLowerCase();
+      const aniosElegidos = elegidos(checksAnio);
+      const materiasElegidas = elegidos(checksMateria);
+      const contenidosElegidos = elegidos(checksContenido);
+      const tiposElegidos = elegidos(checksTipo);
+
+      tarjetas.forEach(function(tarjeta) {
+        const titulo = (tarjeta.dataset.titulo || '').toLowerCase();
+        const materia = (tarjeta.dataset.materia || '').toLowerCase();
+        const anio = tarjeta.dataset.anio || '';
+        const contenido = (tarjeta.dataset.contenido || '').toLowerCase();
+        const tipo = (tarjeta.dataset.tipo || '').toLowerCase();
+
+        const coincideTexto = titulo.includes(consulta) || materia.includes(consulta);
+
+        // En cada grupo: si no hay nada tildado, no filtra (pasan todas).
+        // Si hay algo tildado, la tarjeta tiene que coincidir con al menos una opción tildada.
+        const coincideAnio = aniosElegidos.length === 0 || aniosElegidos.includes(anio);
+        const coincideMateria = materiasElegidas.length === 0 || materiasElegidas.includes(materia);
+        const coincideContenido = contenidosElegidos.length === 0 || contenidosElegidos.includes(contenido);
+        const coincideTipo = tiposElegidos.length === 0 || tiposElegidos.includes(tipo);
+
+        const coincide = coincideTexto && coincideAnio && coincideMateria && coincideContenido && coincideTipo;
+
+        tarjeta.style.display = coincide ? 'flex' : 'none';
+      });
+    }
+
+    buscador.addEventListener('input', aplicarFiltros);
+    [checksAnio, checksMateria, checksContenido, checksTipo].forEach(function(grupo) {
+      grupo.forEach(function(chk) {
+        chk.addEventListener('change', aplicarFiltros);
+      });
+    });
+  </script>
+
+  <script>
+    document.querySelectorAll('.indice-alfabetico button').forEach(function(btn){
+      btn.addEventListener('click', function(){
+        var letra = btn.getAttribute('data-letra');
+        var el = document.getElementById('letra-' + letra);
+        if (el) {
+          el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+      });
+    });
+  </script>
+
+</body>
+</html>
