@@ -222,29 +222,26 @@
       <p class="ayuda">Si escribís algo que no existe, se agrega como pendiente de aprobación hasta que un administrador lo revise.</p>
     </div>
 
-    <div class="fila-dos">
-      <div class="campo">
-        <label>Año</label>
-        <select>
-          <option>1.º año</option>
-          <option>2.º año</option>
-          <option>3.º año</option>
-          <option selected>4.º año</option>
-          <option>5.º año</option>
-          <option>6.º año</option>
-        </select>
+    <div class="campo">
+      <label>Año</label>
+      <select>
+        <option>1.º año</option>
+        <option>2.º año</option>
+        <option>3.º año</option>
+        <option selected>4.º año</option>
+        <option>5.º año</option>
+        <option>6.º año</option>
+      </select>
+    </div>
+
+    <div class="campo combo">
+      <label>Tipo de archivo</label>
+      <div class="chips" id="chips-tipo">
+        <span class="chip">Experimento <button onclick="quitarChip(this)">×</button></span>
       </div>
-      <div class="campo">
-        <label>Tipo de archivo</label>
-        <select>
-          <option>Presentación</option>
-          <option>Texto</option>
-          <option>Planificación</option>
-          <option>Proyecto / laboratorio</option>
-          <option>Simulador</option>
-          <option selected>Experimento</option>
-        </select>
-      </div>
+      <input type="text" id="input-tipo" placeholder="Escribí para buscar o agregar un tipo de archivo…" autocomplete="off">
+      <div class="combo-lista" id="lista-tipo"></div>
+      <p class="ayuda">Elegí uno solo. Si no está en la lista, se agrega como pendiente de aprobación.</p>
     </div>
 
     <div class="campo combo">
@@ -273,10 +270,12 @@
   // Listas "existentes" de ejemplo — en la versión real vendrían de la base de datos
   const opcionesBase = {
     materia: ["Física","Fisicoquímica","Biología","Matemática","Química","Partículas, Energía y Cosmología","Radiación y Vida","Química, Alimentación y Salud","Ecología","Historia de la Vida y de la Tierra","Filosofía de la Ciencia y la Tecnología","Problemáticas Científicas con Impacto Social","Lógica y Filosofía de la Ciencia","Matemática para la Física","Física y Tecnología","Problemáticas de la Física Actual","Laboratorio"],
-    contenido: ["Álgebra","Biotecnología","Derivada","Energía","Estadística y probabilidad","Evolución","Geometría","Integral","Límite","Salud y ambiente","Universo y radiación"]
+    contenido: ["Álgebra","Biotecnología","Derivada","Energía","Estadística y probabilidad","Evolución","Geometría","Integral","Límite","Salud y ambiente","Universo y radiación"],
+    tipo: ["Presentación","Texto","Planificación","Proyecto / laboratorio","Simulador","Experimento"]
   };
 
-  function setupCombo(nombre){
+  function setupCombo(nombre, opciones){
+    const unicoValor = (opciones && opciones.unico) || false;
     const input = document.getElementById('input-' + nombre);
     const lista = document.getElementById('lista-' + nombre);
     const chipsBox = document.getElementById('chips-' + nombre);
@@ -286,6 +285,9 @@
     }
 
     function agregarChip(texto, esNueva){
+      if (unicoValor) {
+        chipsBox.innerHTML = ''; // en modo único, el nuevo reemplaza al anterior
+      }
       const chip = document.createElement('span');
       chip.className = 'chip' + (esNueva ? ' nueva' : '');
       chip.innerHTML = texto + ' <button onclick="quitarChip(this)">×</button>';
@@ -353,6 +355,7 @@
 
   setupCombo('materia');
   setupCombo('contenido');
+  setupCombo('tipo', { unico: true });
 </script>
 
 </body>
